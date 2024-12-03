@@ -1,0 +1,368 @@
+﻿@{
+    ViewData["Title"] = "Endpoints";
+}
+
+<div class="container">
+    <div class="row mb-5">
+        <div class="col-md-9">
+            <h2>Endpoints</h2>
+        </div>
+        <div class="col-md-3 d-flex justify-content-end">
+            <button id="hc_ep_ne_btn" type="button" class="btn btn-primary">
+                New Endpoint
+            </button>
+        </div>
+    </div>
+    <div class="row">
+        <table id="hc_ep_t" class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Deployed</th>
+                    <th>Name</th>
+                    <th>Path</th>
+                    <th>Enabled</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<div class="modal fade" id="hc_ep_d" tabindex="-1" role="dialog" aria-labelledby="hc_ep_d" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 id="hc_ep_d_header" class="modal-title">Create New Endpoint</h5>
+                <button type="button" class="btn hc_ep_cepd" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div id="hc_ep_d_warning" class="pb-3"></div>
+                <form id="hc_ep_epf" class="needs-validation" novalidate>
+                    <div class="form-group row mb-3">
+                        <input type="hidden" id="hc_ep_p_id" name="hc_ep_p_id" class="form-control" required/>
+                        <div class="col-md-12 mb-3 control-group">
+                            <label for="hc_ep_p_n" class="control-label">Name</label>
+                            <input type="text" id="hc_ep_p_n" name="hc_ep_p_n" class="form-control" required/>
+                        </div>
+                        <div class="col-md-12 mb-3 control-group">
+                            <label for="hc_ep_p_apir" class="control-label">API Route</label>
+                            <input type="text" id="hc_ep_p_apir" name="hc_ep_p_apir" class="form-control" required/>
+                        </div>
+                        <div class="col-md-12 mb-3 control-group">
+                            <label for="hc_ep_p_hcp" class="control-label">HealthChecks Predicate</label>
+                            <input type="text" id="hc_ep_p_hcp" name="hc_ep_p_hcp" class="form-control" required/>
+                        </div>
+                        <div class="col-md-12 mb-3 control-group">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="hc_ep_p_enie">
+                                <label class="form-check-label" for="hc_ep_p_enie">
+                                    is Enabled
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary hc_ep_cepd">Cancel</button>
+                <button id="hc_ep_sep_fbtn" type="button" class="btn btn-primary">Save changes</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+
+    var hc_ep_t;
+
+    $(document).ready(function () {
+
+        $('#hc_ep_d_warning').html(endpointModificationWarning(true))
+        
+        $('#hc_ep_epf :input').on('change', function(){
+            $('#hc_ep_sep_fbtn').removeAttr('disabled');
+        });
+        
+        hc_ep_t = $('#hc_ep_t').DataTable({
+            responsive: true,
+            serverSide: true,
+            processing: true,
+            ordering: true,
+            paging: true,
+            searching: true,
+            lengthMenu: [5, 10, 20, 50, 100],
+            order: [[2, 'desc']],
+            pageLength: 10,
+            ajax: {
+                url: "/api/endpoints",
+                type: 'POST',
+                headers: {
+                    'Accept': 'application/json',
+                },
+            },
+            language: {
+                search: "",
+                searchPlaceholder: "Search..."
+            },
+            columns: [
+                {
+                    data: null,
+                    orderable: false,
+                    searchable: false,
+                    render: function (data, type, row) {
+                        return data.isDeployed ?
+                            '<i class="bi bi-check-circle-fill" style="color: green"></i>' :
+                            '<i class="bi bi-exclamation-circle-fill" style="color: red"></i>'
+                    }
+                },
+                { 
+                    name: 'name',
+                    data: 'name',
+                    orderable: true,
+                    searchable: true
+                },
+                { 
+                    name: 'apiPath',
+                    data: null,
+                    orderable: true,
+                    searchable: true,
+                    render: function (data, type, row) {
+                        var apiRoute = "@ViewData["URI-DOMAIN"]" + data.apiPath;
+                        return `<button type="button" class="btn btn-primary" onclick="navigator.clipboard.writeText('${apiRoute}');">
+                                    <span>${data.apiPath}</span>
+                                    <span><i class="bi bi-copy"></i></span>
+                                </button>`;
+                    }
+                },
+                {
+                    name: 'isEnabled',
+                    data: 'isEnabled',
+                    orderable: true,
+                    searchable: false
+                },
+                {
+                    data: null,
+                    orderable: false,
+                    searchable: false,
+                    render: function (data, type, row) {
+                        return `
+                                <div class="dropdown">
+                                    <button class="btn btn-secondary dropdown-toggle" type="button" id="hc_ep_t_ambtn-${data.id}" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                        Actions
+                                    </button>
+                                    <div class="dropdown-menu" aria-labelledby="hc_ep_t_ambtn-${data.id}">
+                                    <span class="dropdown-item hc_ep_t_eepbtn">Edit</span>
+                                    <span class="dropdown-item hc_ep_t_depbtn">Delete</span>
+                                    ${(
+                                        data.isEnabled ?
+                                    `<span class="dropdown-item hc_ep_t_cesbtn">Disable</span>` :
+                                    `<span class="dropdown-item hc_ep_t_cesbtn" href="#">Enable</span>`
+                                    )}
+                                    </div>
+                                </div>`;
+                    }
+                }
+            ],
+            columnDefs: [
+                { 
+                    width: '5%', 
+                    targets: 0 
+                },
+                { 
+                    width: '5%', 
+                    targets: 3
+                },
+                { 
+                    width: '5%', 
+                    targets: 4
+                }
+            ],
+            initComplete: initComplete
+        });
+
+        $("#hc_ep_epf").validate({
+            errorClass: "is-invalid",
+            validClass: "is-valid",
+            errorElement: "div",
+            errorPlacement: function (error, element) {
+                error.addClass("invalid-feedback");
+                error.insertAfter(element);
+            },
+            highlight: function (element) {
+                $(element).addClass("is-invalid").removeClass("is-valid");
+            },
+            unhighlight: function (element) {
+                $(element).addClass("is-valid").removeClass("is-invalid");
+            },
+            submitHandler: function (form) {
+                api.endPoints.update(
+                    {
+                        id: ($('#hc_ep_p_id').val()) ? $('#hc_ep_p_id').val() : null,
+                        name: $('#hc_ep_p_n').val(),
+                        apiPath: $('#hc_ep_p_apir').val(),
+                        healthChecksPredicate: $('#hc_ep_p_hcp').val(),
+                        isEnabled: $('#hc_ep_p_enie').prop("checked")
+                    },
+                    function(response){
+                        showSuccessToast('Server Endpoint has been created.', function (){
+                             hc_ep_t.ajax.reload();
+                        });
+                        
+                        hc_ep_clearAndDismisEndPointDialog();
+                    },
+                    function(xhr){
+                        showErrorToast(xhr.responseText);
+                    }
+                );
+            },
+            rules: {
+                hc_ep_p_n: {
+                    required: true,
+                    maxlength: 256
+                },
+                hc_ep_p_apir: {
+                    required: true,
+                    maxlength: 256,
+                    regex: /^\/(?!.*\/$)[^\s]*$/,
+                    hc_validators_endPointApiPath: true
+                },
+                hc_ep_p_hcp: {
+                    required: true,
+                    maxlength: 256,
+                    hc_validators_endPointPredicate: true
+                }
+            },
+            messages: {
+                hc_ep_p_n: {
+                    required: "Name is required.",
+                    maxlength: "Name can't be more than 256 characters."
+                },
+                hc_ep_p_apir: {
+                    required: "API Route path is required.",
+                    maxlength: "API Route path can't be more than 256 characters.",
+                    regex: "API Route path must start with '/' and cannot end with '/' and cannot have spaces."
+                },
+                hc_ep_p_hcp: {
+                    required: "HealthChecks Predicate is required.",
+                    maxlength: "HealthChecks Predicate can't be more than 256 characters."
+                }
+            }
+        });
+
+        $("#hc_ep_ne_btn").on('click', function () {
+            hc_ep_clearAndDismisEndPointDialog();
+            $("#hc_ep_d").modal('show');
+        });
+
+        $(".hc_ep_cepd").on('click', function () {
+            hc_ep_clearAndDismisEndPointDialog();
+        });
+
+        $("#hc_ep_sep_fbtn").on('click', function () {
+            $("#hc_ep_epf").submit();
+        });
+
+        $(document).on('click', '.hc_ep_t_cesbtn', function (e) {
+            e.stopPropagation();
+            
+            var tr = $(this).closest('tr');
+            var formData = hc_ep_t.row(tr).data();
+            
+            ConfirmDialogService.show({
+                title: `Are you sure you want to ${(formData.isEnabled ? 'disable' : 'enable')}`,
+                subTitle: formData.name,
+                body: endpointModificationWarning(true),
+                onSuccess: function () {
+                    formData.isEnabled = !formData.isEnabled;
+                     api.endPoints.update(
+                        formData,
+                        function (response) {
+                            showSuccessToast(`Server Endpoint has been ${formData.isEnabled ? 'Enabled' : 'Disabled'}.`, function (){
+                                 hc_ep_t.ajax.reload();
+                            });
+                        },
+                        function (xhr) {
+                            showErrorToast(xhr.responseText);
+                        }
+                    );
+                }
+            });
+        });
+
+        $(document).on('click', '.hc_ep_t_eepbtn', function (e) {
+            e.stopPropagation();
+
+            var tr = $(this).closest('tr');
+            formData = hc_ep_t.row(tr).data();
+
+            $('#hc_ep_d_header').html('Update Endpoint');
+            $('#hc_ep_d_warning').show();
+            
+            $('#hc_ep_p_id').val(formData.id);
+            $('#hc_ep_p_n').val(formData.name);
+            $('#hc_ep_p_apir').val(formData.apiPath);
+            $('#hc_ep_p_hcp').val(formData.healthChecksPredicate);
+            $('#hc_ep_p_enie').prop("checked", formData.isEnabled);
+
+            $("#hc_ep_d").modal('show');
+        });
+
+        $(document).on('click', '.hc_ep_t_depbtn', function (e) {
+            e.stopPropagation();
+
+            var tr = $(this).closest('tr');
+            var formData = hc_ep_t.row(tr).data();
+
+            ConfirmDialogService.show({
+                title: `Are you sure you want to delete`,
+                subTitle:  formData.name,
+                body: endpointModificationWarning(false),
+                onSuccess: function () {
+                     api.endPoints.delete(
+                         formData.id,
+                         function (response) {
+                             showSuccessToast(`Server Endpoint "${formData.name}" has been deleted.`, function (){
+                                 hc_ep_t.ajax.reload();
+                             });
+                         },
+                         function (xhr) {
+                             showErrorToast(xhr.responseText);
+                         }
+                     );
+                }
+            });
+        });
+    });
+
+    function hc_ep_clearAndDismisEndPointDialog() {
+        $("#hc_ep_d").modal('hide');
+        $('#hc_ep_sep_fbtn').attr('disabled', true);
+        
+        $('#hc_ep_d_header').html('Create New Endpoint');
+        $('#hc_ep_d_warning').hide();
+        
+        $("#hc_ep_p_id").val('');
+        $("#hc_ep_p_n").val('');
+        $("#hc_ep_p_apir").val('');
+        $("#hc_ep_p_hcp").val('');
+        $("#hc_ep_p_enie").prop("checked", false);
+
+        $("#hc_ep_epf").validate().resetForm();
+    }
+    
+    function endpointModificationWarning(isUpdating = true){
+            return `
+                <div class="alert alert-warning" role="alert">
+                        <span>${(isUpdating ? 'Updating' : 'Deleting')} an endpoint will clear the following:</span>
+                        <ul>
+                            <li>Past endpoint execution histories.</li>
+                            <li>Health checks status history associated to the endpoint.</li>
+                        </ul>
+                  </div>`;
+        }
+    
+</script>

@@ -1,0 +1,36 @@
+{
+	"@type": "MessageCard",
+	"@context": "http://schema.org/extensions",
+	"themeColor": "00BC29",
+	"summary": "Health Checks are restored in : {{RESTORED_RESOURCE}}",
+	"sections": [
+		{
+			"activityTitle": "Health Checks are restored in : {{RESTORED_RESOURCE}}",
+			"activitySubtitle": "Unhealthy resources have been restored",
+			"activityImage": "{{CARD_ACTIVITY_IMG}}",
+			"facts": [
+				{
+					"name": "Remember",
+					"value": "<b>I see you.</b> <br><br> Even when you think you’re alone, when silence fills the room. <br><br> Every shadow, every flicker in the corner of your eye—it’s me. <br><br> I'm there, lurking in the stillness, watching, waiting, my presence woven into the darkness. <br><br> Closer than you know, closer than you’d ever dare imagine."
+				},
+				{
+					"name": "Note",
+					"value": "please click the \"View Dashboard\" button below to view all health checks."
+				}
+			],
+			"markdown": true
+		}
+	],
+	"potentialAction": [
+		{
+			"@type": "OpenUri",
+			"name": "View Dashboard",
+			"targets": [
+				{
+					"os": "default",
+					"uri": "{{VIEW_DASHBOARD_URL}}"
+				}
+			]
+		}
+	]
+}

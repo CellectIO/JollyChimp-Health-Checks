@@ -1,0 +1,38 @@
+﻿.hc-aside.is-open .hc-aside__logo {
+    height: 8rem !important;
+    width: 8rem !important;
+    min-width: 4rem !important;
+}
+
+.hc-liveness__header {
+    background-color: #ffffff;
+    border-radius: 12px;
+    padding: 15px;
+    margin-bottom: 15px;
+    box-shadow: var(--default-box-shadow);
+}
+
+.hc-liveness__container {
+    background-color: #ffffff;
+    border-radius: 12px;
+    padding: 0px 15px;
+    margin-bottom: 15px;
+    box-shadow: var(--default-box-shadow);
+}
+
+.hc-liveness__header>h1{
+    font-size: 32px;
+    line-height: 40px;
+    font-weight: var(--font-weight-bold);
+    margin: 0px;
+}
+
+.hc-button{
+    background: #0270E0;
+    height: 48px;
+    border-radius: 1000px;
+    color: #fff !important;
+    font-size: 16px;
+    padding: 0px 16px;
+    width: fit-content;
+}

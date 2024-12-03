@@ -1,0 +1,44 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body style="font-family: Arial, sans-serif; margin: 0; padding: 0; background-color: {{THEME_MAIN_BG_COLOR}}; color: #333;">
+    <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+            <td align="center" style="padding: 20px;">
+                <table width="600" cellpadding="0" cellspacing="0" border="0" style="background-color: {{THEME_CARD_CONTENT_BG_COLOR}}; border-radius: 8px; overflow: hidden;">
+                    <tr>
+                        <td align="center" style="padding: 20px; background-color: {{THEME_CARD_BG_COLOR}};">
+                            <img src="{{FAILURE_IMG_URL}}" alt="Animated Image" width="100%" style="max-width: 560px; border-radius: 8px;">
+                        </td>
+                    </tr>
+                    <tr>
+                        <td align="center" style="padding: 20px 20px 10px;">
+                            <h1 style="font-size: {{THEME_PRIMARY_TEXT_FONT_SIZE}}; line-height: {{THEME_PRIMARY_TEXT_LINE_HEIGHT}}; font-weight: {{THEME_PRIMARY_TEXT_FONT_WEIGHT}}; margin: 0; color: {{THEME_TEXT_COLOR_HIGHLIGHTED}};">Health Checks are failing in : {{FAILURE_RESOURCE}}</h1>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td align="center" style="padding: 0 20px 20px;">
+                            <p style="font-size: {{THEME_SECONDARY_TEXT_FONT_SIZE}}; line-height: {{THEME_SECONDARY_TEXT_LINE_HEIGHT}}; font-weight: {{THEME_SECONDARY_TEXT_FONT_WEIGHT}}; margin: 0; color: {{THEME_TEXT_COLOR_PRIMARY}};">{{FAILURE_COUNT}} Unhealthy resources</p>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 0 20px 20px;">
+                            <table width="100%" cellpadding="0" cellspacing="0" border="0">
+                                {{FAILURE_SERVICE}}
+                            </table>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td align="center" style="padding: 20px; background-color: {{THEME_CARD_BG_COLOR}}; color: {{THEME_TEXT_COLOR_SECONDARY}}; font-size: 12px;">
+                            <p style="font-size: {{THEME_SECONDARY_TEXT_FONT_SIZE}}; line-height: {{THEME_SECONDARY_TEXT_LINE_HEIGHT}}; font-weight: {{THEME_SECONDARY_TEXT_FONT_WEIGHT}}; margin: 0;">Please visit <a href="{{VIEW_FAILURES_URL}}" style="color: {{THEME_TEXT_COLOR_HIGHLIGHTED}}; text-decoration: none;">JollyChimp HealthChecks Dashboard</a> to view all failures.</p>
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </table>
+</body>
+</html>

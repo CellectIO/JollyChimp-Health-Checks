@@ -1,0 +1,133 @@
+﻿<div class="d-flex flex-column flex-shrink-0 p-3 text-white bg-dark main-nav container">
+    <div class="hc-aside__logo">
+    </div>
+    <a href="/" class="d-flex mb-3 mb-md-0 align-self-center text-decoration-none heading-text-container">
+        <div class="heading-text-container d-flex flex-column">
+            <span>JollyChimp</span>
+            <span>Health Checks</span>
+        </div>
+    </a>
+    <hr>
+    <ul class="nav nav-pills flex-column mb-auto">
+      <li class="nav-item">
+          <a href="~/home" class="nav-link text-white" aria-current="page">
+              <i class="bi bi-house-heart nav-icon me-2"></i>
+              Home
+          </a>
+      </li>
+        <li class="nav-item">
+            <a href="~/Home/ServerSettings" class="nav-link text-white">
+                <i class="bi bi-gear nav-icon me-2"></i>
+                Settings
+            </a>
+        </li>
+       <li class="nav-item">
+            <a href="~/Home/HealthChecks" class="nav-link text-white">
+                <i class="bi bi-activity nav-icon me-2"></i>
+                Checks
+            </a>
+        </li>
+       <li class="nav-item">
+            <a href="~/Home/EndPoints" class="nav-link text-white">
+                <i class="bi bi-globe nav-icon me-2"></i>
+                Endpoints
+            </a>
+        </li>
+        <li class="nav-item">
+            <a href="~/Home/WebHooks" class="nav-link text-white">
+                <i class="bi bi-layer-backward nav-icon me-2"></i>
+                Webhooks
+            </a>
+        </li>
+        <li class="nav-item">
+            <a href="~/Home/ChangeLogs" class="nav-link text-white">
+                 <i class="bi bi-hourglass-split nav-icon me-2"></i>
+                Change Logs
+            </a>
+        </li>
+        <li class="nav-item">
+            <a href="~/hc-ui" class="nav-link text-white">
+                 <i class="bi bi-display nav-icon me-2"></i>
+                Dashboard
+            </a>
+        </li>
+    </ul>
+    <hr>
+    <ul class="nav nav-pills flex-column">
+      <li class="nav-item">
+          <a href="~/SignOut" class="nav-link text-white" aria-current="page">
+              <i class="bi bi-box-arrow-left nav-icon me-2"></i>
+              Sign Out
+          </a>
+      </li>
+    </ul>
+</div>
+
+<style>
+    .main-nav{
+        padding-top: 15px;
+        padding-bottom: 15px;
+        background-color: var(--background-secondary);
+        height: 100vh;
+        width: 12rem;
+    }
+    
+    .nav-icon{
+        font-size: 18px;
+        cursor: pointer;
+        color: var(--primaryColor);
+    }
+    
+    .heading-text-container span:nth-of-type(1) {
+        color: var(--text-color-primary);
+        margin-top: 5px;
+        font-size: 28px;
+        font-weight: 500;
+    }
+    
+    .heading-text-container span:nth-of-type(2) {
+        color: var(--text-color-secondary);
+        font-size: 14px;
+    }
+    
+    .nav-pills :hover>.nav-link {
+        color: #fff;
+        background-color: var(--grayColor) !important;
+        border: 1px solid var(--primaryColor) !important;
+    }
+    
+    .hc-aside__logo {
+            background-color: var(--primaryColor);
+            background-image: var(--logoImageUrl2);
+            background-position: center;
+            background-size: cover;
+            border-radius: 50%;
+            width: 150px;
+            height: 150px;
+            background-repeat: no-repeat;
+            margin: .5rem 0;
+            transition: all ease-in .2s;
+            align-self: center;
+    }
+</style>
+
+<script>
+    $(document).ready(function () {
+        // Get the current URL
+        var currentUrl = window.location.pathname;
+    
+        // Iterate through each navigation link
+        $(".nav-pills li a").each(function () {
+            // Get the href of the link
+            var linkUrl = $(this).attr("href");
+            
+            // Check if the link URL matches the current URL
+            if (currentUrl === linkUrl) {
+                // Add the active class to the parent list item
+                $(this).addClass("active");
+            }else{
+                $(this).removeClass("active");
+            }
+        });
+    });
+</script>

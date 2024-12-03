@@ -1,0 +1,53 @@
+﻿:root {
+    --background-primary: #0d111d;
+    --background-secondary: #20242f;
+    --text-color-primary: #f9fbfb;
+    --text-color-secondary: #7e828c;
+
+    --font-family: 'Roboto', sans-serif;
+    --font-weight-bold: 700;
+
+    --default-box-shadow: 0 4px 16px 0 rgba(0, 0, 0, 0.0509803922);
+
+    --primaryColor: #a39dfc;
+    --primaryColorDim: rgba(163, 157, 252, .2);
+    
+    --secondaryColor: #3792f3;
+    --dangerColor: #f94a4a;
+    --warningColor: #ff8f30;
+    --successColor: #5ffb6d;
+    
+    --darkColor: #000000;
+    --midDarkColor: #2f313a;
+    --grayColor: #444444;
+    --midGrayColor: #ebebeb;
+    --lightColor: #f6f6f7;
+
+    --bgMain: var(--background-primary);
+    --bgSecondary: #ffffff;
+    --fcNegative: #ffffff;
+    --fcBase: var(--grayColor);
+    --bgAside: var(--background-secondary);
+    --bgMenuActive: var(--darkColor);
+    --bcMenuActive: var(--text-color-primary);
+    --bcInput: var(--midGrayColor);
+    --bcInputHover: var(--primaryColor);
+    --bgInputHover: var(--primaryColor);
+    --fcInputHover: var(--primaryColor);
+    --bcTable: var(--midGrayColor);
+    --bgTable: var(--bgSecondary);
+    --bgTableSecondary: var(--midGrayColor);
+    --bgTableButton: var(--bgSecondary);
+    --bgButton: var(--text-color-primary);
+    --bgImageDarken: linear-gradient(rgba(0, 0, 0, 0.2), rgba(0, 0, 0, 0.2));
+    --bgImageLigthen: linear-gradient(
+        rgba(255, 255, 255, 0.8),
+        rgba(255, 255, 255, 0.8)
+    );
+
+    /* 
+        TODO: find a way to rather reference the constant file defined in the LIB, don't use this static link.
+    */
+    --logoImageUrl: url('https://i.giphy.com/media/v1.Y2lkPTc5MGI3NjExZ2tyZ3lod3kwZTAzaWsxZHd0dHptbnZ6dTJyMGV4Y2RmdHc5Y2tobyZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/lXacgQUELi6LjIesXD/giphy.gif');
+    --logoImageUrl2: url("https://i.giphy.com/media/v1.Y2lkPTc5MGI3NjExc3JrdjEweHpmNjY5Y2tlYXlyendydnJxdHZlc3FpOTBtOHNkOTduYiZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/BLQxhKOS0aiOVXJRVz/giphy.gif");
+}

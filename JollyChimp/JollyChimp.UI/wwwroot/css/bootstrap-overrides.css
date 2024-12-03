@@ -1,0 +1,127 @@
+﻿/*form controls*/
+
+.form-control {
+    color: var(--text-color-primary) !important;
+    background-color: var(--background-secondary) !important;
+    border: 1px solid var(--primaryColor) !important;
+}
+
+.form-control.is-invalid:focus, .was-validated .form-control:invalid:focus {
+    border-color: var(--primaryColor) !important;
+    box-shadow: 0 0 0 .25rem var(--dangerColor) !important;
+}
+
+.form-control.is-valid:focus, .was-validated .form-control:valid:focus {
+    border-color: var(--primaryColor) !important;
+    box-shadow: 0 0 0 .25rem var(--successColor) !important;
+}
+
+.control-label, .form-check-label, .col-form-label{
+    color: var(--text-color-primary) !important;
+}
+
+/*buttons*/
+
+.btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
+    box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
+}
+
+.btn-primary {
+    color: var(--background-primary) !important;
+    background-color: var(--primaryColor) !important;
+    border-color: var(--primaryColor) !important;
+}
+
+.btn-secondary {
+    color: var(--text-color-primary) !important;
+    background-color: var(--text-color-secondary) !important;
+    border-color: var(--primaryColorDim) !important;
+}
+
+.btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
+    box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem var(--primaryColor) !important;
+}
+
+/*checkboxes*/
+
+.form-check-input{
+    background-color: var(--background-secondary);
+    border-color: var(--primaryColor);
+}
+
+.form-check-input:checked {
+    background-color: var(--primaryColor) !important;
+    border-color: var(--primaryColor) !important;
+}
+
+/*nav*/
+
+.nav-item {
+    padding-top: 8px;
+    padding-bottom: 8px;
+}
+
+.nav-item > a {
+    color: var(--text-color-secondary);
+    text-decoration: none
+}
+
+.nav-pills .nav-link.active, .nav-pills .show>.nav-link {
+    color: #fff;
+    background-color: var(--grayColor) !important;
+    border: 1px solid var(--primaryColor) !important;
+}
+
+/*table*/
+
+.table {
+    font-family: var(--font-family) !important;
+    color: var(--text-color-primary) !important;
+}
+
+.dt-container {
+    color: var(--text-color-primary) !important;
+}
+
+div.dt-container .dt-paging .dt-paging-button.current, div.dt-container .dt-paging .dt-paging-button.current:hover {
+    color: var(--text-color-primary) !important;
+    background-color: var(--primaryColor) !important;
+    border-color: var(--primaryColor) !important;
+}
+
+.table-striped>tbody>tr:nth-of-type(odd) {
+    --bs-table-accent-bg: var(--midDarkColor) !important;
+    color: var(--text-color-primary) !important;
+}
+
+/*modal*/
+
+.modal-content {
+    background-color: var(--background-secondary);
+    background-clip: padding-box;
+    border: 1px solid var(--background-secondary) !important;
+}
+
+.modal-footer {
+    border-color: var(--primaryColorDim) !important;
+}
+
+.modal-header {
+    border-color: var(--primaryColorDim) !important;
+}
+
+/*alerts*/
+
+.alert-danger {
+    color: var(--text-color-primary) !important;
+    background-color: var(--dangerColor) !important;
+    border-color: var(--background-secondary) !important;
+    margin-bottom: 0px !important;
+}
+
+.alert-warning {
+    color: var(--text-color-primary) !important;
+    background-color: var(--warningColor) !important;
+    border-color: var(--background-secondary) !important;
+    margin-bottom: 0px !important;
+}

@@ -1,0 +1,257 @@
+﻿@{
+    ViewData["Title"] = "Server Settings";
+}
+
+<div class="container">
+    <div class="row">
+
+        <div class="row mb-5">
+            <h2>Server Settings</h2>
+        </div>
+
+        <form id="hc_ss_f" class="needs-validation" novalidate>
+            
+            <div class="form-group row form-control-row-pad-md">
+                <div class="col-md-6">
+                    <label for="hc_ss_p_etis" class="d-flex col-form-label W-full">
+                        Evaluation Time (Seconds)
+                    </label>
+                    <label class="form-control-row-desc-label">
+                        Configures the UI to poll for healthchecks updates
+                    </label>
+                </div>
+                <div class="col-md-6 form-control-row-align-center">
+                    <input type="number" id="hc_ss_p_etis" name="hc_ss_p_etis" class="form-control" required/>
+                </div>
+            </div>
+            <hr class="form-control-row-linebreak">
+            <div class="form-group row form-control-row-pad-md">
+                <div class="col-md-6">
+                    <label for="hc_ss_p_amar" class="d-flex col-form-label W-full">
+                        Max Active API Requests
+                    </label>
+                    <label class="form-control-row-desc-label">
+                        Only one active request will be executed at a time. 
+                        All the excedent requests will result in 429 (Too many requests)
+                    </label>
+                </div>
+                <div class="col-md-6 form-control-row-align-center">
+                    <input type="number" id="hc_ss_p_amar" name="hc_ss_p_amar" class="form-control"/>
+                </div>
+            </div>
+            <hr class="form-control-row-linebreak">
+            <div class="form-group row form-control-row-pad-md">
+                <div class="col-md-6">
+                     <label for="hc_ss_p_mhepe" class="d-flex col-form-label W-full">
+                        Max History Entries Per Endpoint
+                    </label>
+                    <label class="form-control-row-desc-label">
+                        Set the maximum history entries by endpoint that will be served by the UI api middleware
+                    </label>
+                </div>
+                <div class="col-md-6 form-control-row-align-center">
+                    <input type="number" id="hc_ss_p_mhepe" name="hc_ss_p_mhepe" class="form-control"/>
+                </div>
+            </div>
+            <hr class="form-control-row-linebreak">
+            <div class="form-group row form-control-row-pad-md">
+                <div class="col-md-6">
+                    <label for="hc_ss_p_msbfn" class="d-flex col-form-label W-full">
+                        Min Seconds Between Failure Notifications
+                    </label>
+                    <label class="form-control-row-desc-label">
+                        The minimum seconds between failure notifications to avoid receiver flooding
+                    </label>
+                </div>
+                <div class="col-md-6 form-control-row-align-center">
+                    <input type="number" id="hc_ss_p_msbfn" name="hc_ss_p_msbfn" class="form-control"/>
+                </div>
+            </div>
+            <hr class="form-control-row-linebreak">
+            <div class="form-group row form-control-row-pad-md">
+                <div class="col-md-6">
+                    <label for="hc_ss_p_ht" class="d-flex col-form-label W-full">
+                        Header Text
+                    </label>
+                    <label class="form-control-row-desc-label">
+                        Text that is visible on the health checks dashboard
+                    </label>
+                </div>
+                <div class="col-md-6 form-control-row-align-center">
+                    <input type="text" id="hc_ss_p_ht" name="hc_ss_p_ht" class="form-control"/>
+                </div>
+            </div>
+            <hr class="form-control-row-linebreak">
+            <div class="form-group row form-control-row-pad-md">
+                <div class="col-md-6">
+                    <label for="hc_ss_p_urp" class="d-flex col-form-label W-full">
+                        UI Route Path
+                    </label>
+                    <label class="form-control-row-desc-label">
+                        Configures the health Check dashboard routing path (this will be removed in the future)
+                    </label>
+                </div>
+                <div class="col-md-6 form-control-row-align-center">
+                    <input type="text" id="hc_ss_p_urp" name="hc_ss_p_urp" class="form-control" disabled/>
+                </div>
+            </div>
+            <hr class="form-control-row-linebreak">
+            <div class="form-group row form-control-row-pad-md">
+                <div class="col-md-6">
+                    <label for="hc_ss_p_nuhotuc" class="d-flex col-form-label W-full">
+                        Notify UnHealthy OneTime Until Change
+                    </label>
+                    <label class="form-control-row-desc-label">
+                        You will only receive one failure notification until the status changes
+                    </label>
+                </div>
+                <div class="col-md-6 form-control-row-align-center">
+                    <input class="form-check-input" type="checkbox" id="hc_ss_p_nuhotuc">
+                </div>
+            </div>
+
+            <div class="d-flex justify-content-end">
+                <button type="submit" class="btn btn-primary">Save Changes</button>
+            </div>
+        </form>
+
+    </div>
+</div>
+
+<style>
+    
+    .form-control-row-linebreak {
+        color: var(--primaryColorDim) !important;
+    }
+    
+    .form-control-row-pad-md {
+        padding: 8px;
+    }
+    
+    .form-control-row-align-center{
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+    }
+    
+    .form-control-row-desc-label{
+        color:  var(--grayColor);
+    }
+    
+</style>
+
+<script type="text/javascript">
+    $(document).ready(function () {
+
+        api.serverSettings.get(
+            function (response) {
+                $('#hc_ss_p_etis').val(response.evaluationTimeInSeconds);
+                $('#hc_ss_p_amar').val(response.apiMaxActiveRequests);
+                $('#hc_ss_p_mhepe').val(response.maximumHistoryEntriesPerEndpoint);
+                $('#hc_ss_p_msbfn').val(response.minimumSecondsBetweenFailureNotifications);
+                $('#hc_ss_p_ht').val(response.headerText);
+                $('#hc_ss_p_urp').val(response.uiRoutePath);
+                $('#hc_ss_p_nuhotuc').prop("checked", response.notifyUnHealthyOneTimeUntilChange);
+            },
+            function (xhr) {
+                toastr.error(xhr.responseText, 'Error!');
+            });
+
+        $("#hc_ss_f").validate({
+            errorClass: "is-invalid",
+            validClass: "is-valid",
+            errorElement: "div",
+            errorPlacement: function (error, element) {
+                error.addClass("invalid-feedback");
+                error.insertAfter(element);
+            },
+            highlight: function (element) {
+                $(element).addClass("is-invalid").removeClass("is-valid");
+            },
+            unhighlight: function (element) {
+                $(element).addClass("is-valid").removeClass("is-invalid");
+            },
+            submitHandler: function (form) {
+                api.serverSettings.update(
+                    {
+                        evaluationTimeInSeconds: +$('#hc_ss_p_etis').val(),
+                        apiMaxActiveRequests: +$('#hc_ss_p_amar').val(),
+                        maximumHistoryEntriesPerEndpoint: +$('#hc_ss_p_mhepe').val(),
+                        minimumSecondsBetweenFailureNotifications: +$('#hc_ss_p_msbfn').val(),
+                        headerText: $('#hc_ss_p_ht').val(),
+                        uiRoutePath: $('#hc_ss_p_urp').val(),
+                        notifyUnHealthyOneTimeUntilChange: $('#hc_ss_p_nuhotuc').prop("checked")
+                    },
+                    function (response) {
+                        toastr.success('Server Settings have been updated.', 'Success!');
+                        toastr.warning('New settings will only take affect after the application has been restarted', 'Remeber!');
+                        $("#hc_ss_f").validate().resetForm();
+                    },
+                    function (xhr) {
+                        toastr.error(xhr.responseText, 'Error!');
+                    });
+            },
+            rules: {
+                hc_ss_p_etis: {
+                    required: true,
+                    range: [1, 86400]
+                },
+                hc_ss_p_amar: {
+                    required: true,
+                    range: [1, 10000]
+                },
+                hc_ss_p_mhepe: {
+                    required: true,
+                    range: [1, 250]
+                },
+                hc_ss_p_msbfn: {
+                    required: true,
+                    range: [1, 86400]
+                },
+                hc_ss_p_nuhotuc: {
+                    required: true
+                },
+                hc_ss_p_ht: {
+                    required: true,
+                    maxlength: 256
+                },
+                hc_ss_p_urp: {
+                    required: true,
+                    maxlength: 256,
+                    regex: /^\/(?!.*\/$)[^\s]*$/
+                }
+            },
+            messages: {
+                hc_ss_p_etis: {
+                    required: "Evaluation Time is required.",
+                    range: "Evaluation time must be between 1 and 86400."
+                },
+                hc_ss_p_amar: {
+                    required: "Max active requests are required.",
+                    range: "Max active requests must be between 1 and 10000."
+                },
+                hc_ss_p_mhepe: {
+                    required: "Maximum history entries are required.",
+                    range: "Maximum history entries must be between 1 and 250."
+                },
+                hc_ss_p_msbfn: {
+                    required: "Minimum seconds between failure notifications is required.",
+                    range: "Minimum seconds must be between 1 and 86400."
+                },
+                hc_ss_p_nuhotuc: {
+                    required: "This field is required."
+                },
+                hc_ss_p_ht: {
+                    required: "Header text is required.",
+                    maxlength: "Header text can't be more than 256 characters."
+                },
+                hc_ss_p_urp: {
+                    required: "UI route path is required.",
+                    maxlength: "UI route path can't be more than 256 characters.",
+                    regex: "UI route path must start with '/' and cannot end with '/' or have spaces."
+                }
+            }
+        });
+
+    });
+</script>

@@ -1,0 +1,403 @@
+﻿@{
+    ViewData["Title"] = "WebHooks";
+}
+
+<div class="container">
+   <div class="row mb-5">
+        <div class="col-md-9">
+            <h2>WebHooks</h2>
+        </div>
+        <div class="col-md-3 d-flex justify-content-end">
+            <button id="hc_wh_nwhbtn" type="button" class="btn btn-primary">
+                New WebHook
+            </button>
+        </div>
+    </div>
+    <div class="row">
+        <table id="hc_wh_wht" class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Deployed</th>
+                    <th>Name</th>
+                    <th>Type</th>
+                    <th>Enabled</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<div class="modal fade" id="hc_wh_whd" tabindex="-1" role="dialog" aria-labelledby="hc_wh_whd" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Create New WebHook</h5>
+                <button type="button" class="btn hc_wh_cwhd" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="hc_wh_whf" class="needs-validation" novalidate>
+                    <div class="form-group row mb-3">
+                        <input type="hidden" id="hc_wh_p_id" name="hc_wh_p_id" class="form-control" required />
+                        <div class="col-md-12 mb-3 control-group">
+                            <label for="hc_wh_p_n" class="control-label">Name</label>
+                            <input type="text" id="hc_wh_p_n" name="hc_wh_p_n" class="form-control" required />
+                        </div>
+                        <div class="col-md-12 mb-3 control-group">
+                            <label for="hc_wh_p_wht" class="control-label">Type</label>
+                            <select id="hc_wh_p_wht" name="hc_wh_p_wht" class="form-control" required>
+                            </select>
+                        </div>
+                        <div id="hc_wh_p_whp" class="col-md-12 mb-3">
+
+                        </div>
+
+                        <div class="col-md-12 mb-3 control-group">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="hc_wh_p_whe">
+                                <label class="form-check-label" for="hc_wh_p_whe">
+                                    WebHook is Enabled
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary hc_wh_cwhd">Cancel</button>
+                <button id="hc_wh_swhfbtn" type="button" class="btn btn-primary">Save changes</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+
+    var hc_wh_wht;
+    var hc_wh_webHookDefinitions = [];
+
+    $(document).ready(function () {
+
+        api.webHooks.definitions(
+            function (response) {
+                //SET GLOBAL VAR FOR OTHER FUNCTIONALITY TO ACCESS
+                hc_wh_webHookDefinitions = response;
+                
+                //INIT TABLE
+                hc_wh_init();
+
+                //SET DIALOG FORM
+                $("#hc_wh_p_wht").append($("<option />").val(null).text('Select...'));
+                $.each(response, function (i, v) {
+                    $("#hc_wh_p_wht").append($(`<option />`).val(v.type).text(v.name));
+                });
+            },
+            function (xhr) {
+                toastr.error(xhr.responseText, 'Error!');
+            }
+        );
+
+        $('#hc_wh_p_wht').on('change', function () {
+            var whType = $("#hc_wh_p_wht").val();
+            hc_wh_registerWebHookTypeFormFields(whType);
+        });
+
+        $("#hc_wh_nwhbtn").on('click', function () {
+            $("#hc_wh_p_wht").prop('disabled', false);
+            $("#hc_wh_whd").modal('show');
+        });
+
+        $(".hc_wh_cwhd").on('click', function () {
+            hc_wh_clearAndDismisWebHookDialog();
+        });
+
+        $("#hc_wh_swhfbtn").on('click', function () {
+            $("#hc_wh_whf").submit();
+        });
+
+        $(document).on('click', '.hc_wh_cwhesbtn', function (e) {
+            e.stopPropagation();
+
+            var tr = $(this).closest('tr');
+            formData = hc_wh_wht.row(tr).data();
+            formData.isEnabled = !formData.isEnabled;
+
+            api.webHooks.update(
+                formData,
+                function (response) {
+                    hc_wh_showSuccessToastAndReload(`WebHook has been ${formData.isEnabled ? 'enabled' : 'disabled'}.`);
+                },
+                function (xhr) {
+                    toastr.error(xhr.responseText, 'Error!');
+                }
+            );
+        });
+
+        $(document).on('click', '.hc_wh_ewhbtn', function (e) {
+            e.stopPropagation();
+
+            var tr = $(this).closest('tr');
+            formData = hc_wh_wht.row(tr).data();
+
+            $('#hc_wh_p_id').val(formData.id);
+            $('#hc_wh_p_n').val(formData.name);
+            $('#hc_wh_p_whe').prop("checked", formData.isEnabled);
+
+            $("#hc_wh_p_wht").prop('disabled', true);
+            $('#hc_wh_p_wht').val(formData.type);
+            $("#hc_wh_p_wht").change();
+
+            hc_wh_setWebHookTypeFormFieldValues(formData);
+
+            $("#hc_wh_whd").modal('show');
+        });
+
+        $(document).on('click', '.hc_wh_dwhbtn', function (e) {
+            e.stopPropagation();
+
+            var tr = $(this).closest('tr');
+            formData = hc_wh_wht.row(tr).data();
+
+            ConfirmDialogService.show({
+                title: `Are you sure you want to delete: ${formData.name}`,
+                onSuccess: function () {
+                     api.webHooks.delete(
+                         formData.id,
+                         function (response) {
+                             hc_wh_showSuccessToastAndReload(`WebHook "${formData.name}" has been deleted.`);
+                         },
+                         function (xhr) {
+                             toastr.error(xhr.responseText, 'Error!');
+                         }
+                     );
+                }
+            });
+        });
+    });
+
+    function hc_wh_init() {
+        hc_wh_wht = $('#hc_wh_wht').DataTable({
+            responsive: true,
+            serverSide: true,
+            processing: true,
+            ordering: true,
+            paging: true,
+            searching: true,
+            lengthMenu: [5, 10, 20, 50, 100],
+            order: [[2, 'desc']],
+            pageLength: 10,
+            ajax: {
+                url: "/api/webhooks",
+                type: 'POST',
+                headers: {
+                    'Accept': 'application/json',
+                },
+            },
+            language: {
+                search: "",
+                searchPlaceholder: "Search..."
+            },
+            columns: [
+                {
+                    data: null,
+                    orderable: false,
+                    searchable: false,
+                    render: function (data, type, row) {
+                        return data.isDeployed ?
+                            '<i class="bi bi-check-circle-fill" style="color: green"></i>' :
+                            '<i class="bi bi-exclamation-circle-fill" style="color: red"></i>'
+                    }
+                },
+                {
+                    name: 'name',
+                    data: 'name',
+                    orderable: true,
+                    searchable: true
+                },
+                {
+                    name: 'type',
+                    data: null,
+                    orderable: true,
+                    searchable: true,
+                    render: function (data, type, row) {
+                        var targetHook = hc_wh_webHookDefinitions.filter(_ => _.type == data.type);
+                        if (targetHook.length > 0){
+                            return targetHook[0].name
+                        }else{
+                            return ':(';
+                        }
+                    }
+                },
+                {
+                    name: 'isEnabled',
+                    data: 'isEnabled',
+                    orderable: true,
+                    searchable: false
+                },
+                {
+                    data: null,
+                    orderable: false,
+                    searchable: false,
+                    render: function (data, type, row) {
+                        return `
+                                        <div class="dropdown">
+                                            <button class="btn btn-secondary dropdown-toggle" type="button" id="hc_wh_ambtn-${data.id}" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                                Actions
+                                            </button>
+                                            <div class="dropdown-menu" aria-labelledby="hc_wh_ambtn-${data.id}">
+                                            <span class="dropdown-item hc_wh_ewhbtn">Edit</span>
+                                            <span class="dropdown-item hc_wh_dwhbtn">Delete</span>
+                                            ${(
+                                data.isEnabled ?
+                                    `<span class="dropdown-item hc_wh_cwhesbtn">Disable</span>` :
+                                    `<span class="dropdown-item hc_wh_cwhesbtn" href="#">Enable</span>`
+                            )}
+                                            </div>
+                                        </div>`;
+                    }
+                }
+            ],
+            columnDefs: [
+                { 
+                    width: '5%', 
+                    targets: 0 
+                },
+                { 
+                    width: '5%', 
+                    targets: 3
+                },
+                { 
+                    width: '5%', 
+                    targets: 4
+                }
+            ],
+            initComplete: initComplete
+        });
+
+        $("#hc_wh_whf").validate({
+            errorClass: "is-invalid",
+            validClass: "is-valid",
+            errorElement: "div",
+            errorPlacement: function (error, element) {
+                error.addClass("invalid-feedback");
+                error.insertAfter(element);
+            },
+            highlight: function (element) {
+                $(element).addClass("is-invalid").removeClass("is-valid");
+            },
+            unhighlight: function (element) {
+                $(element).addClass("is-valid").removeClass("is-invalid");
+            },
+            submitHandler: function (form) {
+                const whParams = [];
+                $('#hc_wh_p_whp').find(':input').each(function () {
+                    const inputName = $(this).attr('name');
+                    if (inputName) {
+                        whParams.push({
+                            "name": inputName,
+                            "value": $(this).val()
+                        });
+                    }
+                });
+
+                api.webHooks.update(
+                    {
+                        id: ($('#hc_wh_p_id').val()) ? $('#hc_wh_p_id').val() : null,
+                        name: $('#hc_wh_p_n').val(),
+                        type: +$('#hc_wh_p_wht').val(),
+                        isEnabled: $('#hc_wh_p_whe').prop("checked"),
+                        parameters: whParams
+                    },
+                    function (response) {
+                        hc_wh_showSuccessToastAndReload('WebHook has been created.');
+                        hc_wh_clearAndDismisWebHookDialog();
+                    },
+                    function (xhr) {
+                        toastr.error(xhr.responseText, 'Error!');
+                    }
+                );
+            },
+            rules: {
+                hc_wh_p_n: {
+                    required: true,
+                    maxlength: 256
+                },
+                hc_wh_p_wht: {
+                    required: true,
+                },
+            },
+            messages: {
+                hc_wh_p_n: {
+                    required: "Name is required.",
+                    maxlength: "Name can't be more than 256 characters."
+                },
+                hc_wh_p_wht: {
+                    required: "WebHook Type is required."
+                }
+            }
+        });
+    }
+
+    function hc_wh_showSuccessToastAndReload(successMsg) {
+        toastr.success(successMsg, 'Success!');
+        toastr.warning('Changes too WebHook will only take affect after the application has been restarted', 'Remeber!');
+        hc_wh_wht.ajax.reload();
+    }
+
+    function hc_wh_clearAndDismisWebHookDialog() {
+        hc_wh_clearWebHookDialogForm();
+        $("#hc_wh_whf").validate().resetForm();
+        $("#hc_wh_whd").modal('hide');
+    }
+
+    function hc_wh_registerWebHookTypeFormFields(whType) {
+        $("#hc_wh_p_whp").empty();
+
+        if (!(whType)) {
+            //DEFAULT SELECT OPTION ACTIVE
+            return;
+        }
+
+        var targetHook = hc_wh_webHookDefinitions.filter(_ => _.type == whType);
+
+        $.each(targetHook[0].parameters, function (index, value) {
+            //APPEND THE PARAMETER FIELD
+            var parameterFieldId = `hc_wh_p_dwhp_${value.name}`;
+            
+            var paramHtml = `
+                            <div class="col-md-12 mb-3 control-group">
+                                <label for="${parameterFieldId}" class="control-label">${value.displayName}</label>
+                                <input type="${value.formType}" id="${parameterFieldId}" name="${value.name}" class="form-control" required />
+                            </div>
+                            `;
+            $("#hc_wh_p_whp").append(paramHtml);
+
+            //ADD VALIDATION TO THE FIELD
+            var validationObject = {};
+            $.each(value.validationRules, function(index, value) {
+                validationObject[value] = true;
+            });
+            $(`#${parameterFieldId}`).rules("add", validationObject);
+        });
+    }
+
+    function hc_wh_setWebHookTypeFormFieldValues(targetHook) {
+        $.each(targetHook.parameters, function (index, value) {
+            var parameterFieldId = `hc_wh_p_dwhp_${value.name}`;
+            $(`#${parameterFieldId}`).val(value.value);
+        });
+    }
+
+    function hc_wh_clearWebHookDialogForm(){
+        $("#hc_wh_p_id").val('');
+        $("#hc_wh_p_n").val('');
+        $("#hc_wh_p_wht").val(null);
+        $("#hc_wh_p_whp").empty();
+        $("#hc_wh_p_whe").prop("checked", false);
+    }
+
+</script>

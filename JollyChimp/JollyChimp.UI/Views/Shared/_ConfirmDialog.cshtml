@@ -1,0 +1,63 @@
+﻿<div class="modal fade" id="hc_confirm_dialog" tabindex="-1" role="dialog" aria-labelledby="hc_confirm_dialog" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div>
+                    <h5 id="hc_confirm_dialog_header" class="modal-title"></h5>
+                    <p id="hc_confirm_dialog_sub_header" class="mb-0"></p>
+                </div>
+                <button type="button" class="btn closeHcConfirmDialog" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div id="hc_confirm_dialog_body" class="modal-body">
+                
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary closeHcConfirmDialog">Cancel</button>
+                <button id="confirmHcConfirmDialog" type="button" class="btn btn-primary">Confirm</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+
+    const ConfirmDialogService = {
+        show: function (options) {
+            const modal = new bootstrap.Modal(document.getElementById('hc_confirm_dialog'));
+    
+            // Populate the modal with provided content
+            $('#hc_confirm_dialog_header').text(options.title || 'Confirm');
+            $('#hc_confirm_dialog_body').html(options.body || 'Are you sure?');
+            if (options.subTitle){
+                $('#hc_confirm_dialog_sub_header').text(options.subTitle); 
+            }else{
+                $('#hc_confirm_dialog_sub_header').remove();
+            }
+    
+            // Attach event listeners to the buttons
+            $('#confirmHcConfirmDialog')
+                .off('click') // Remove previous click handlers
+                .on('click', function () {
+                    modal.hide();
+                    if (typeof options.onSuccess === 'function') {
+                        options.onSuccess();
+                    }
+                });
+    
+            $('.closeHcConfirmDialog')
+                .off('click') // Remove previous click handlers
+                .on('click', function () {
+                    modal.hide();
+                    if (typeof options.onCancel === 'function') {
+                        options.onCancel();
+                    }
+                });
+    
+            // Show the modal
+            modal.show();
+        },
+    };
+    
+</script>

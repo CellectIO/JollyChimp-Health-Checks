@@ -1,0 +1,70 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+    <PropertyGroup>
+        <TargetFramework>net8.0</TargetFramework>
+        <Nullable>enable</Nullable>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <UserSecretsId>f6ab0ca2-7860-4ec7-96ca-d3654247e3e2</UserSecretsId>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <PackageReference Include="Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation" Version="8.0.10" />
+      <PackageReference Include="Microsoft.Extensions.Configuration.UserSecrets" Version="8.0.1" />
+    </ItemGroup>
+
+    <ItemGroup>
+       <ProjectReference Include="..\JollyChimp.Core.Common\JollyChimp.Core.Common.csproj" />
+       <ProjectReference Include="..\JollyChimp.Core.Services\JollyChimp.Core.Services.csproj" />
+       <ProjectReference Include="..\JollyChimp.HealthChecks\JollyChimp.HealthChecks.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Content Update="Views\Home\Index.cshtml">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </Content>
+      <Content Update="wwwroot\css\bootstrap-icons-1.11.3\font\bootstrap-icons.json">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </Content>
+      <Content Update="wwwroot\css\bootstrap-icons-1.11.3\font\bootstrap-icons.scss">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </Content>
+      <Content Update="wwwroot\css\bootstrap-icons-1.11.3\font\fonts\bootstrap-icons.woff">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </Content>
+      <Content Update="wwwroot\css\bootstrap-icons-1.11.3\font\fonts\bootstrap-icons.woff2">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </Content>
+      <Content Update="wwwroot\css\theme-vars.css">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </Content>
+      <Content Update="wwwroot\css\health-check-dashboard.css">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </Content>
+      <Content Update="wwwroot\js\jquery-validators.js">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </Content>
+      <Content Update="wwwroot\lib\bootstrap-icons-1.11.3\font\bootstrap-icons.scss">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </Content>
+      <Content Update="wwwroot\css\bootstrap-overrides.css">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </Content>
+      <Content Update="wwwroot\css\jolly-chimp.css">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </Content>
+      <Content Remove="Startup\**" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Compile Remove="Startup\**" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <EmbeddedResource Remove="Startup\**" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <None Remove="Startup\**" />
+    </ItemGroup>
+
+</Project>

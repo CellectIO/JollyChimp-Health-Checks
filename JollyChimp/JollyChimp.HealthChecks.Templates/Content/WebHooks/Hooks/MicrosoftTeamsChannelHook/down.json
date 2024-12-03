@@ -1,0 +1,36 @@
+{
+	"@type": "MessageCard",
+	"@context": "http://schema.org/extensions",
+	"themeColor": "BC0003",
+	"summary": "Health Checks are failing in : {{FAILURE_RESOURCE}}",
+	"sections": [
+		{
+			"activityTitle": "Health Checks are failing in : {{FAILURE_RESOURCE}}",
+			"activitySubtitle": "{{FAILURE_COUNT}} Unhealthy resources",
+			"activityImage": "{{CARD_ACTIVITY_IMG}}",
+			"facts": [
+				{
+					"name": "Failures",
+					"value": "{{FAILURES}}"
+				},
+				{
+					"name": "Note",
+					"value": "Please click the \"View Failures\" button below to view all failures."
+				}
+			],
+			"markdown": true
+		}
+	],
+	"potentialAction": [
+		{
+			"@type": "OpenUri",
+			"name": "View Failures",
+			"targets": [
+				{
+					"os": "default",
+					"uri": "{{VIEW_FAILURES_URL}}"
+				}
+			]
+		}
+	]
+}

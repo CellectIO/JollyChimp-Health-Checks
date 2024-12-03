@@ -1,0 +1,481 @@
+﻿@{
+    ViewData["Title"] = "Health Checks";
+}
+
+<div class="container">
+   <div class="row mb-5">
+        <div class="col-md-9">
+            <h2>Health Checks</h2>
+        </div>
+        <div class="col-md-3 d-flex justify-content-end">
+            <button id="hc_hc_nhcbtn" type="button" class="btn btn-primary">
+                New Health Check
+            </button>
+        </div>
+    </div>
+    <div class="row">
+        <table id="hc_hc_hct" class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Deployed</th>
+                    <th>Name</th>
+                    <th>Type</th>
+                    <th>Tags</th>
+                    <th>Enabled</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<div class="modal fade" id="hc_hc_hcd" tabindex="-1" role="dialog" aria-labelledby="hc_hc_hcd" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Create New Health Check</h5>
+                <button type="button" class="btn hc_hc_chcd" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div id="hc_hc_d_warning" class="pb-3"></div>
+                <form id="hc_hc_hcf" class="needs-validation" novalidate>
+                    <div class="form-group row mb-3">
+                        <input type="hidden" id="hc_hc_p_id" name="hc_hc_p_id" class="form-control" required/>
+                        <div class="col-md-12 mb-3 control-group">
+                            <label for="hc_hc_p_n" class="control-label">Name</label>
+                            <input type="text" id="hc_hc_p_n" name="hc_hc_p_n" class="form-control" required/>
+                        </div>
+                        <div class="col-md-12 mb-3 control-group">
+                            <label for="hc_hc_p_fs" class="control-label">Failure Status</label>
+                            <select id="hc_hc_p_fs" name="hc_hc_p_fs" class="form-control" required>
+                                <option value="0">Unhealthy</option>
+                                <option value="1">Degraded</option>
+                                <option value="2">Healthy</option>
+                            </select>
+                        </div>
+                        <div id="hc_hc_p_t_dynamic_container">
+                            
+                        </div>
+                        <div class="col-md-12 mb-3 control-group">
+                            <label for="hc_hc_p_hct" class="control-label">Type</label>
+                            <select id="hc_hc_p_hct" name="hc_hc_p_hct" class="form-control" required>
+                            </select>
+                        </div>
+                        <div id="hc_hc_p_hcp" class="col-md-12 mb-3">
+
+                        </div>
+                        <div class="col-md-12 mb-3 control-group">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="hc_hc_p_hce">
+                                <label class="form-check-label" for="hc_hc_p_hce">
+                                    HealthCheck is Enabled
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary hc_hc_chcd">Cancel</button>
+                <button id="hc_hc_shcfbtn" type="button" class="btn btn-primary">Save changes</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+
+    var hc_hc_hct;
+    var hc_hc_healthCheckDefinitions = [];
+    
+    $(document).ready(function () {
+
+         $('#hc_hc_d_warning').html(healthCheckModificationWarning(true))
+        
+         var $hcTagsContent = $(`#hc_hc_p_t_dynamic_container`).generateTagsFormField({
+            containerId: `hc_hc_p_t_container`,
+            valueContainerId: 'hc_hc_p_t',
+            label: 'Tags',
+            hiddenInputName: 'hcTags',
+            editorPlaceholder: 'Enter Tag name and press Enter'
+        });
+        $("#hc_hc_p_t_dynamic_container").append($hcTagsContent);
+        
+        api.healthChecks.definitions(
+            function (response) {
+                //SET GLOBAL VAR FOR OTHER FUNCTIONALITY TO ACCESS
+                hc_hc_healthCheckDefinitions = response;
+                
+                //INIT TABLE
+                hc_hc_init();
+                
+                //SET DIALOG FORM
+                $("#hc_hc_p_hct").append($("<option />").val(null).text('Select...'));
+                
+                var healthCheckCategories = response.reduce(function(healthChecks, healthCheck) {
+                                                (healthChecks[healthCheck['catergory'].name] = healthChecks[healthCheck['catergory'].name] || []).push(healthCheck);
+                                                return healthChecks;
+                                              }, {});
+                
+                $.each(Object.keys(healthCheckCategories), function(catIdx, category){
+                    const $optionGroup = $('<optgroup>').attr('label', category);
+                    healthCheckCategories[category].forEach(function(categoryValue) {
+                         $optionGroup
+                            .append($(`<option />`)
+                            .prop('disabled', !categoryValue.isEnabled)
+                            .val(categoryValue.type)
+                            .text(categoryValue.name));
+                    });
+                    $("#hc_hc_p_hct").append($optionGroup)
+                });
+            },
+            function (xhr) {
+                toastr.error(xhr.responseText, 'Error!');
+            }
+        );
+
+        $('#hc_hc_p_hct').on('change', function () {
+            var whType = $("#hc_hc_p_hct").val();
+            hc_hc_registerHealthCheckTypeFormFields(whType);
+        });
+
+        $("#hc_hc_nhcbtn").on('click', function () {
+            hc_hc_clearAndDismisHealthCheckDialog()
+            $("#hc_hc_p_hct").prop('disabled', false);
+            $("#hc_hc_hcd").modal('show');
+        });
+
+        $(".hc_hc_chcd").on('click', function () {
+            hc_hc_clearAndDismisHealthCheckDialog();
+        });
+
+        $("#hc_hc_shcfbtn").on('click', function () {
+            $("#hc_hc_hcf").submit();
+        });
+
+        $(document).on('click', '.hc_hc_chcesbtn', function (e) {
+            e.stopPropagation();
+
+            var tr = $(this).closest('tr');
+            formData = hc_hc_hct.row(tr).data();
+            formData.isEnabled = !formData.isEnabled;
+
+            api.healthChecks.update(
+                formData,
+                function (response) {
+                    hc_hc_showSuccessToastAndReload(`HealthCheck has been ${formData.isEnabled ? 'enabled' : 'disabled'}.`);
+                },
+                function (xhr) {
+                    toastr.error(xhr.responseText, 'Error!');
+                }
+            );
+        });
+
+        $(document).on('click', '.hc_hc_ehcbtn', function (e) {
+            e.stopPropagation();
+
+            var tr = $(this).closest('tr');
+            formData = hc_hc_hct.row(tr).data();
+
+            $('#hc_hc_d_warning').show();
+            
+            $('#hc_hc_p_id').val(formData.id);
+            $('#hc_hc_p_n').val(formData.name);
+            $('#hc_hc_p_t').val(formData.tags.join(','));
+            $('#hc_hc_p_t').change();
+            $('#hc_hc_p_hce').prop("checked", formData.isEnabled);
+
+            $("#hc_hc_p_hct").prop('disabled', true);
+            $('#hc_hc_p_hct').val(formData.type);
+            $("#hc_hc_p_hct").change();
+
+            hc_hc_setHealthCheckTypeFormFieldValues(formData);
+
+            $("#hc_hc_hcd").modal('show');
+        });
+
+        $(document).on('click', '.hc_hc_dhcbtn', function (e) {
+            e.stopPropagation();
+
+            var tr = $(this).closest('tr');
+            formData = hc_hc_hct.row(tr).data();
+
+            api.healthChecks.delete(
+                formData.id,
+                function (response) {
+                    hc_hc_showSuccessToastAndReload(`HealthCheck "${formData.name}" has been deleted.`);
+                },
+                function (xhr) {
+                    toastr.error(xhr.responseText, 'Error!');
+                }
+            );
+        });
+    });
+
+    function hc_hc_init() {
+        hc_hc_hct = $('#hc_hc_hct').DataTable({
+            responsive: false,
+            serverSide: true,
+            processing: true,
+            ordering: true,
+            paging: true,
+            searching: true,
+            lengthMenu: [5, 10, 20, 50, 100],
+            order: [[2, 'desc']],
+            pageLength: 10,
+            ajax: {
+                url: "/api/healthchecks",
+                type: 'POST',
+                headers: {
+                    'Accept': 'application/json',
+                },
+            },
+            language: {
+                search: "",
+                searchPlaceholder: "Search..."
+            },
+            columns: [
+                {
+                    data: null,
+                    orderable: false,
+                    searchable: false,
+                    render: function (data, type, row) {
+                        return data.isDeployed ?
+                            '<i class="bi bi-check-circle-fill" style="color: var(--successColor);"></i>' :
+                            '<i class="bi bi-exclamation-circle-fill" style="color: var(--dangerColor);"></i>'
+                    }
+                },
+                {
+                    name: 'name',
+                    data: 'name',
+                    orderable: true,
+                    searchable: true
+                },
+                {
+                    name: 'type',
+                    data: null,
+                    orderable: true,
+                    searchable: true,
+                    render: function (data, type, row) {
+                        var targetHook = hc_hc_healthCheckDefinitions.filter(_ => _.type == data.type);
+                        if (targetHook.length > 0){
+                            return targetHook[0].name
+                        }else{
+                            return ':(';
+                        }
+                    }
+                },
+                {
+                    name: 'tags',
+                    data: null,
+                    orderable: true,
+                    searchable: true,
+                    render: function (data, type, row) {
+                        const tags = data.tags
+                             .map(t => `<span class="badge bg-color-primary color-primary me-2">${t}</span>`)
+                             .join('');
+                        return `<div>${tags}</div>`
+                    }
+                },
+                {
+                    name: 'isEnabled',
+                    data: 'isEnabled',
+                    orderable: true,
+                    searchable: false
+                },
+                {
+                    data: null,
+                    orderable: false,
+                    searchable: false,
+                    render: function (data, type, row) {
+                        return `
+                                        <div class="dropdown">
+                                            <button class="btn btn-secondary dropdown-toggle" type="button" id="hc_hc_ambtn-${data.id}" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                                Actions
+                                            </button>
+                                            <div class="dropdown-menu" aria-labelledby="hc_hc_ambtn-${data.id}">
+                                            <span class="dropdown-item hc_hc_ehcbtn">Edit</span>
+                                            <span class="dropdown-item hc_hc_dhcbtn">Delete</span>
+                                            ${(
+                                data.isEnabled ?
+                                    `<span class="dropdown-item hc_hc_chcesbtn">Disable</span>` :
+                                    `<span class="dropdown-item hc_hc_chcesbtn" href="#">Enable</span>`
+                            )}
+                                            </div>
+                                        </div>`;
+                    }
+                }
+            ],
+            columnDefs: [
+                { 
+                    width: '5%', 
+                    targets: 0 
+                },
+                { 
+                    width: '5%', 
+                    targets: 4
+                },
+                { 
+                    width: '5%', 
+                    targets: 5
+                }
+            ],
+            initComplete: initComplete
+        });
+
+        $("#hc_hc_hcf").validate({
+            errorClass: "is-invalid",
+            validClass: "is-valid",
+            errorElement: "div",
+            errorPlacement: function (error, element) {
+                error.addClass("invalid-feedback");
+                error.insertAfter(element);
+            },
+            highlight: function (element) {
+                $(element).addClass("is-invalid").removeClass("is-valid");
+            },
+            unhighlight: function (element) {
+                $(element).addClass("is-valid").removeClass("is-invalid");
+            },
+            submitHandler: function (form) {
+                const whParams = [];
+                $('#hc_hc_p_hcp').find(':input').each(function () {
+                    const inputName = $(this).attr('name');
+                    if (inputName) {
+                        whParams.push({
+                            "name": inputName,
+                            "value": $(this).val()
+                        });
+                    }
+                });
+                
+                console.log(($('#hc_hc_p_id').val()) ? $('#hc_hc_p_id').val() : null);
+                
+                api.healthChecks.update(
+                    {
+                        id: ($('#hc_hc_p_id').val()) ? $('#hc_hc_p_id').val() : null,
+                        name: $('#hc_hc_p_n').val(),
+                        type: +$('#hc_hc_p_hct').val(),
+                        failureStatus: +$('#hc_hc_p_fs').val(),
+                        isEnabled: $('#hc_hc_p_hce').prop("checked"),
+                        tags: $('#hc_hc_p_t').val().split(','),
+                        parameters: whParams
+                    },
+                    function (response) {
+                        hc_hc_showSuccessToastAndReload('HealthCheck has been created.');
+                        hc_hc_clearAndDismisHealthCheckDialog();
+                    },
+                    function (xhr) {
+                        toastr.error(xhr.responseText, 'Error!');
+                    }
+                );
+            },
+            rules: {
+                hc_hc_p_n: {
+                    required: true,
+                    maxlength: 256,
+                    hc_validators_healthCheckName: {
+                        idFormFieldIdentifier: "hc_hc_p_id"
+                    }
+                },
+                hc_hc_p_hct: {
+                    required: true,
+                    maxlength: 256
+                },
+                hc_hc_p_t: {
+                    required: true
+                }
+            },
+            messages: {
+                hc_hc_p_n: {
+                    required: "Name is required.",
+                    maxlength: "Name can't be more than 256 characters."
+                },
+                hc_hc_p_hct: {
+                    required: "HealthCheck Type is required."
+                },
+                hc_hc_p_t: {
+                    required: "HealthCheck Tags is required."
+                }
+            }
+        });
+    }
+
+    function hc_hc_showSuccessToastAndReload(successMsg) {
+        toastr.success(successMsg, 'Success!');
+        toastr.warning('Changes too HealthCheck will only take affect after the application has been restarted', 'Remeber!');
+        hc_hc_hct.ajax.reload();
+    }
+
+    function hc_hc_clearAndDismisHealthCheckDialog() {
+        hc_hc_clearHealthCheckDialogForm();
+        $("#hc_hc_hcf").validate().resetForm();
+        $("#hc_hc_hcd").modal('hide');
+    }
+
+    function hc_hc_registerHealthCheckTypeFormFields(whType) {
+        $("#hc_hc_p_hcp").empty();
+
+        if (!(whType)) {
+            //DEFAULT SELECT OPTION ACTIVE
+            return;
+        }
+
+        var targetHook = hc_hc_healthCheckDefinitions.filter(_ => _.type == whType);
+
+        $.each(targetHook[0].parameters, function (index, value) {
+            //APPEND THE PARAMETER FIELD
+            var parameterFieldId = `hc_hc_p_dhcp_${value.name}`;
+            var paramHtml = $(`#${parameterFieldId}`).generateFormField(parameterFieldId, value);
+            $("#hc_hc_p_hcp").append(paramHtml);
+
+            //ADD VALIDATION TO THE FIELD
+            var validationObject = {};
+            
+            $.each(value.validationRules, function(index, value) {
+                validationObject[value] = true;
+            });
+            
+            $(`#${parameterFieldId}`).rules("add", validationObject);
+        });
+    }
+
+    function hc_hc_setHealthCheckTypeFormFieldValues(targetHook) {
+        $.each(targetHook.parameters, function (index, value) {
+            var parameterFieldId = `hc_hc_p_dhcp_${value.name}`; `hc_hc_p_dhcp_${value.name}`
+            $(`#${parameterFieldId}`).val(value.value);
+            $(`#${parameterFieldId}`).change();
+        });
+    }
+
+    function hc_hc_clearHealthCheckDialogForm(){
+        $('#hc_hc_d_warning').hide();
+        
+        $("#hc_hc_p_id").val('');
+        $("#hc_hc_p_n").val('');
+        $("#hc_hc_p_hct").val(null);
+        $('#hc_hc_p_fs').val(0);
+        
+        $('#hc_hc_p_t_editor').val('');
+        $('#hc_hc_p_t').val('');
+        $('#hc_hc_p_t').change();
+        
+        $("#hc_hc_p_hcp").empty();
+        $("#hc_hc_p_hce").prop("checked", false);
+    }
+    
+    function healthCheckModificationWarning(isUpdating = true){
+        return `
+            <div class="alert alert-warning" role="alert">
+                    <span>${(isUpdating ? 'Updating' : 'Deleting')} an health check will clear the following:</span>
+                    <ul>
+                        <li>Past health check execution histories associated to an endpoint.</li>
+                    </ul>
+              </div>`;
+    }
+
+</script>
